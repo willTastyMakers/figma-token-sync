@@ -1,0 +1,15 @@
+{
+  "name": "@examples/material3",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Material Design 3 token example",
+  "scripts": {
+    "sync:pull": "figma-token-sync pull",
+    "sync:push": "figma-token-sync push",
+    "sync:diff": "figma-token-sync diff"
+  },
+  "dependencies": {
+    "figma-token-sync": "workspace:*"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "figma-token-sync",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "figma-token-sync": "./bin/figma-token-sync.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@figma-token-sync/core": "workspace:*",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.7.0"
+  }
+}

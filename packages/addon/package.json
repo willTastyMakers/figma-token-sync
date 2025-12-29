@@ -1,0 +1,24 @@
+{
+  "name": "@figma-token-sync/addon",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Storybook addon for Figma token sync (Tier 2+)",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "echo 'Addon implementation planned for Tier 2+'",
+    "typecheck": "echo 'Addon implementation planned for Tier 2+'"
+  },
+  "dependencies": {
+    "@figma-token-sync/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  },
+  "keywords": [
+    "storybook",
+    "addon",
+    "figma",
+    "design-tokens"
+  ]
+}

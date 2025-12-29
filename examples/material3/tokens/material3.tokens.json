@@ -1,0 +1,122 @@
+{
+  "color": {
+    "primary": {
+      "$type": "color",
+      "$value": "#6750A4",
+      "$description": "Primary brand color"
+    },
+    "on-primary": {
+      "$type": "color",
+      "$value": "#FFFFFF",
+      "$description": "Text/icons on primary color"
+    },
+    "primary-container": {
+      "$type": "color",
+      "$value": "#EADDFF",
+      "$description": "Container color for primary elements"
+    },
+    "on-primary-container": {
+      "$type": "color",
+      "$value": "#21005D",
+      "$description": "Text/icons on primary container"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "#625B71",
+      "$description": "Secondary brand color"
+    },
+    "on-secondary": {
+      "$type": "color",
+      "$value": "#FFFFFF",
+      "$description": "Text/icons on secondary color"
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "#FFFBFE",
+      "$description": "Surface background color"
+    },
+    "on-surface": {
+      "$type": "color",
+      "$value": "#1C1B1F",
+      "$description": "Text/icons on surface"
+    }
+  },
+  "typography": {
+    "display-large": {
+      "font-family": {
+        "$type": "fontFamily",
+        "$value": "Roboto"
+      },
+      "font-size": {
+        "$type": "dimension",
+        "$value": "57px"
+      },
+      "font-weight": {
+        "$type": "fontWeight",
+        "$value": "400"
+      },
+      "line-height": {
+        "$type": "dimension",
+        "$value": "64px"
+      }
+    },
+    "headline-large": {
+      "font-family": {
+        "$type": "fontFamily",
+        "$value": "Roboto"
+      },
+      "font-size": {
+        "$type": "dimension",
+        "$value": "32px"
+      },
+      "font-weight": {
+        "$type": "fontWeight",
+        "$value": "400"
+      },
+      "line-height": {
+        "$type": "dimension",
+        "$value": "40px"
+      }
+    },
+    "body-large": {
+      "font-family": {
+        "$type": "fontFamily",
+        "$value": "Roboto"
+      },
+      "font-size": {
+        "$type": "dimension",
+        "$value": "16px"
+      },
+      "font-weight": {
+        "$type": "fontWeight",
+        "$value": "400"
+      },
+      "line-height": {
+        "$type": "dimension",
+        "$value": "24px"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "32px"
+    }
+  }
+}
