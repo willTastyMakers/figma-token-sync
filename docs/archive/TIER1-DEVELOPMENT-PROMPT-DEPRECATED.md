@@ -1,5 +1,21 @@
 # Figma Token Sync — Tier 1 Development Prompt
 
+> **⚠️ DEPRECATED - December 29, 2024**
+>
+> **This document is archived and no longer reflects the actual implementation.**
+>
+> **Why deprecated:** This prompt describes a REST API-based approach that was abandoned because
+> Figma's Variables REST API requires an Enterprise plan ($45/seat/month). On December 29, 2024,
+> the project pivoted to a Plugin-based architecture that works on all Figma plan tiers (Free, Pro, Org, Enterprise).
+>
+> **See instead:**
+> - `TIER1-PROGRESS.md` - Documents the actual implementation and architecture pivot
+> - `FIGMA_DESIGN_SYSTEM_SYNC_SPEC.md` - Current authoritative specification
+>
+> This file is preserved for historical reference only.
+
+---
+
 ## Project Context
 
 You are helping Will build **Tier 1 (CLI Foundation)** of `figma-token-sync`, an open-source Storybook addon that enables bidirectional synchronization of design tokens between code (TypeScript/JSON) and Figma Variables via the REST API.

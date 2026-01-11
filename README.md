@@ -24,34 +24,314 @@ The core transformation engine, Figma Plugin, and CLI commands are fully impleme
 
 ## Quick Start
 
-### Export from Figma
+### Step-by-Step: Export Tokens from Figma
 
-1. Open your Figma file with Variables
-2. Run **Figma Token Sync** plugin (search in Community)
-3. Click **Export** → download `tokens.json`
-4. Save to your project: `./tokens/tokens.json`
+Export your Figma Variables to DTCG-compliant JSON files for use in your codebase.
 
-### Import to Figma
+#### Step 1: Prepare Your Figma File
 
-1. Edit `tokens.json` locally
-2. Open Figma and run plugin
-3. Click **Import** and select your file
-4. Variables update in Figma
+1. **Open your Figma file** containing Variables
+2. **Verify you have Variables set up:**
+   - Open the **Variables** panel (right sidebar)
+   - You should see Collections like "Primitives/Colors" or "Semantic/Colors"
+   - Each Collection contains Variables (e.g., `primary/40`, `surface`, etc.)
+
+> **Note:** If you don't have Variables yet, create them first. See [Figma Variables Guide](https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma)
+
+#### Step 2: Install the Plugin
+
+**For Development (Testing):**
+1. Download this repository
+2. Build the plugin: `cd packages/figma-plugin && pnpm build`
+3. In Figma Desktop: **Plugins → Development → Import plugin from manifest**
+4. Select `packages/figma-plugin/dist/manifest.json`
+
+**For Production:**
+- Search for "Figma Token Sync" in the Figma Community (coming soon)
+- Click **Install** to add to your plugins
+
+#### Step 3: Run the Export
+
+1. **Open the plugin:**
+   - Menu: **Plugins → Figma Token Sync**
+   - Keyboard: `Ctrl/Cmd + /` and type "Figma Token Sync"
+
+2. **You'll see the plugin UI with two export buttons:**
+   - **Export Primitives** - for tonal palettes and base tokens
+   - **Export Semantics** - for semantic color mappings
+
+3. **Export Primitives:**
+   - Click **"Export Primitives"**
+   - This exports collections like "Primitives/Colors"
+   - Downloads as `primitives-colors.json`
+   - Contains raw hex values: `"40": { "$value": "#6750A4" }`
+
+4. **Export Semantics:**
+   - Click **"Export Semantics"**
+   - This exports collections like "Semantic/Colors"
+   - Downloads as `semantic-colors.json`
+   - Contains references: `"primary": { "$value": "{primary.40}" }`
+
+#### Step 4: Save to Your Project
+
+1. **Create tokens directory** in your project (if it doesn't exist):
+   ```bash
+   mkdir -p tokens/primitives tokens/semantic
+   ```
+
+2. **Move the exported files:**
+   ```bash
+   mv ~/Downloads/primitives-colors.json tokens/primitives/colors.json
+   mv ~/Downloads/semantic-colors.json tokens/semantic/colors.light.json
+   ```
+
+3. **Verify the export:**
+   ```bash
+   cat tokens/primitives/colors.json
+   ```
+
+   You should see DTCG-compliant JSON:
+   ```json
+   {
+     "$schema": "https://design-tokens.org/schema.json",
+     "primary": {
+       "$type": "color",
+       "0": { "$value": "#000000" },
+       "10": { "$value": "#102000" },
+       "40": { "$value": "#6750A4" },
+       ...
+     }
+   }
+   ```
+
+#### Step 5: Validate (Optional but Recommended)
+
+```bash
+# Install CLI tools if not already installed
+npm install -g figma-token-sync
+
+# Validate the exported files
+figma-token-sync validate tokens/primitives/colors.json
+figma-token-sync validate tokens/semantic/colors.light.json
+```
+
+Expected output:
+```
+✓ Valid DTCG tokens file
+✓ All tokens have required $value properties
+✓ No circular references detected
+Tokens: 78
+```
+
+---
+
+### Step-by-Step: Import Tokens to Figma
+
+Import DTCG JSON files from your codebase to create or update Figma Variables.
+
+#### Step 1: Prepare Your Token File
+
+1. **Create or edit your tokens file:**
+
+   For Discourser-Design-System workflow:
+   ```bash
+   # Generate tokens.json from your design language
+   cd Discourser-Design-System
+   pnpm run transform:contract-to-dtcg
+   ```
+
+   This creates `tokens/tokens.json` - a single combined file ready for Figma import.
+
+2. **Or manually create a DTCG file:**
+   ```json
+   {
+     "$schema": "https://design-tokens.org/schema.json",
+     "primary": {
+       "$type": "color",
+       "0": { "$value": "#000000" },
+       "10": { "$value": "#21005D" },
+       "40": { "$value": "#6750A4" },
+       "80": { "$value": "#D0BCFF" },
+       "100": { "$value": "#FFFFFF" }
+     },
+     "semantic": {
+       "primary": {
+         "$type": "color",
+         "$value": "{primary.40}"
+       },
+       "onPrimary": {
+         "$type": "color",
+         "$value": "{primary.100}"
+       }
+     }
+   }
+   ```
+
+#### Step 2: Validate Before Import
+
+**Always validate before importing to catch errors early:**
+
+```bash
+figma-token-sync validate tokens/tokens.json
+```
+
+Common validation errors and fixes:
+- **"Missing $value property"** → Add `"$value": "..."` to each token
+- **"Invalid $type"** → Use valid types: `color`, `dimension`, `fontFamily`, `number`, `string`
+- **"Circular reference"** → Check for loops like `{a.b}` → `{c.d}` → `{a.b}`
+
+#### Step 3: Open Figma and Run Plugin
+
+1. **Open your Figma file** where you want to import Variables
+2. **Run the plugin:**
+   - Menu: **Plugins → Figma Token Sync**
+   - Keyboard: `Ctrl/Cmd + /` and type "Figma Token Sync"
+
+#### Step 4: Import Your Tokens
+
+1. **Click "Import Tokens" button** in the plugin UI
+
+2. **Select your token file:**
+   - File picker opens
+   - Navigate to `tokens/tokens.json`
+   - Click **Open**
+
+3. **Plugin processes the file:**
+   - Parses DTCG structure
+   - Identifies Collections and Variables to create/update
+   - Shows preview of changes
+
+4. **Review the preview:**
+   ```
+   Collections to create:
+     ✓ Primitives/Colors (78 variables)
+     ✓ Semantic/Colors (31 variables, 2 modes)
+
+   Variables to update:
+     • primary/40: #6750A4 → #7050B5
+     • surface: {neutral.99} (no change)
+
+   Total changes:
+     Create: 109 variables
+     Update: 1 variable
+   ```
+
+5. **Click "Import" to apply changes**
+
+#### Step 5: Verify in Figma
+
+1. **Open Variables panel** (right sidebar)
+
+2. **Check Collections were created:**
+   - You should see "Primitives/Colors"
+   - You should see "Semantic/Colors"
+
+3. **Verify Variables:**
+   - Expand "Primitives/Colors" collection
+   - Check `primary/40` exists with correct hex value
+   - Expand "Semantic/Colors" collection
+   - Check `primary` exists and references `{Primitives/Colors.primary/40}`
+
+4. **Check Modes (for semantic tokens):**
+   - Select "Semantic/Colors" collection
+   - Look at mode selector at top - should show "light" and "dark"
+   - Switch between modes to verify different values
+
+#### Step 6: Test the Variables
+
+1. **Create a test frame**
+2. **Apply a semantic color:**
+   - Select the frame
+   - In fill properties, click the Variables icon
+   - Choose `Semantic/Colors.primary`
+3. **Toggle between light/dark modes** to verify it works
+
+---
 
 ### Local Commands (No Figma Connection Needed)
+
+Work with token files offline using CLI commands:
 
 ```bash
 # Install CLI tools
 npm install -g figma-token-sync
 
-# Validate token file
+# Validate token file structure
 figma-token-sync validate tokens.json
 
-# Compare two token files
+# Compare two token files (show differences)
 figma-token-sync diff tokens.json backup.json
+
+# Compare with colored output
+figma-token-sync diff tokens.json updated.json
+
+# Compare and output JSON for automation
+figma-token-sync diff tokens.json updated.json --json > changes.json
 
 # Convert between formats
 figma-token-sync convert tokens.json output.json --to language-contract
+```
+
+---
+
+### Common Workflows
+
+#### Workflow 1: Figma → Code (Designer-Led Changes)
+
+```bash
+# 1. Designer updates colors in Figma Variables
+# 2. Export from Figma plugin → primitives-colors.json, semantic-colors.json
+# 3. Move to project
+mv ~/Downloads/primitives-colors.json tokens/primitives/colors.json
+mv ~/Downloads/semantic-colors.json tokens/semantic/colors.light.json
+
+# 4. Transform to TypeScript (Discourser-Design-System)
+cd Discourser-Design-System
+pnpm run transform:dtcg-to-contract
+
+# 5. Verify changes
+git diff src/languages/material3.language.ts
+
+# 6. Rebuild design system
+pnpm build:panda
+
+# 7. Commit changes
+git add tokens/ src/languages/
+git commit -m "Update colors from Figma"
+```
+
+#### Workflow 2: Code → Figma (Developer-Led Changes)
+
+```bash
+# 1. Developer edits TypeScript design language
+code src/languages/material3.language.ts
+
+# 2. Transform to DTCG
+pnpm run transform:contract-to-dtcg
+# Creates tokens/tokens.json
+
+# 3. Validate before import
+figma-token-sync validate tokens/tokens.json
+
+# 4. Import to Figma
+# - Open Figma
+# - Run plugin → Import → select tokens/tokens.json
+
+# 5. Designer reviews changes in Figma
+```
+
+#### Workflow 3: Compare Before Syncing
+
+```bash
+# Export current state from Figma
+# Downloads as primitives-colors.json
+
+# Compare with your local changes
+figma-token-sync diff \
+  tokens/primitives/colors.json \
+  ~/Downloads/primitives-colors.json
+
+# Review the differences before deciding to import
 ```
 
 ## Architecture
@@ -275,41 +555,6 @@ figma-token-sync init
 # - tokens/ directory (token storage)
 # - tokens/tokens.json (sample token file)
 ```
-
-## Plugin Usage
-
-### Export from Figma
-
-1. **Open Figma file** with Variables
-2. **Run plugin**: Plugins → Figma Token Sync
-3. **Click "Export Tokens"**
-4. **Download** `tokens.json` file
-5. **Save** to your project directory
-
-The plugin exports:
-- All local Variable Collections
-- All Variables with their modes
-- Color, number, string, and boolean types
-- References/aliases between variables
-- Variable descriptions and metadata
-
-### Import to Figma
-
-1. **Prepare tokens file** in DTCG format
-2. **Run plugin**: Plugins → Figma Token Sync
-3. **Click "Import Tokens"**
-4. **Select file** to import
-5. **Review changes** in preview
-6. **Click "Import"** to apply
-
-The plugin will:
-- Create new Collections as needed
-- Update existing Variables by name
-- Preserve Variable IDs when possible
-- Create modes for semantic token groups
-- Set up variable references/aliases
-
-**Important:** Typography tokens are NOT supported (Figma Variables limitation).
 
 ## Examples
 
