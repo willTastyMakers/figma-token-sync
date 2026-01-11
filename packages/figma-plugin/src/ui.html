@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Figma Token Sync</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11px;
+      line-height: 16px;
+      color: #333;
+    }
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+    button {
+      width: 100%;
+      padding: 8px 16px;
+      margin-bottom: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #18A0FB;
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0D8CE8;
+    }
+    button:disabled {
+      background: #CCC;
+      cursor: not-allowed;
+    }
+    .secondary {
+      background: #F0F0F0;
+      color: #333;
+    }
+    .secondary:hover {
+      background: #E5E5E5;
+    }
+    #status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #F7F7F7;
+      font-size: 10px;
+      color: #666;
+      display: none;
+    }
+    #status.visible {
+      display: block;
+    }
+    .error {
+      background: #FFE5E5;
+      color: #CC0000;
+    }
+    .success {
+      background: #E5F5E5;
+      color: #006600;
+    }
+    .section {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #E5E5E5;
+    }
+    .section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    input[type="file"] {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <h1>📤 Export Variables</h1>
+    <p style="margin: 0 0 12px; color: #666;">
+      Export Figma Variables to DTCG tokens
+    </p>
+    <button id="export">Export Variables</button>
+    <div id="validationStatus" style="display: none; margin-top: 12px; padding: 8px; border-radius: 4px; font-size: 10px;"></div>
+    <div id="downloadButtons" style="display: none; margin-top: 8px;">
+      <button id="downloadPrimitives" class="secondary">⬇ Download Primitives</button>
+      <button id="downloadSemantic" class="secondary">⬇ Download Semantic</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h1>📥 Import Variables</h1>
+    <p style="margin: 0 0 12px; color: #666;">
+      Import tokens.json to Figma Variables
+    </p>
+    <input type="file" id="fileInput" accept=".json" />
+    <button id="import" disabled>Import from DTCG</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    const exportBtn = document.getElementById('export');
+    const importBtn = document.getElementById('import');
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+    const downloadButtons = document.getElementById('downloadButtons');
+    const downloadPrimitivesBtn = document.getElementById('downloadPrimitives');
+    const downloadSemanticBtn = document.getElementById('downloadSemantic');
+    const validationStatus = document.getElementById('validationStatus');
+
+    let selectedFile = null;
+    let exportedPrimitives = null;
+    let exportedSemantic = null;
+    let validationResult = null;
+
+    // Enable import button when file is selected
+    fileInput.addEventListener('change', (e) => {
+      selectedFile = e.target.files[0];
+      importBtn.disabled = !selectedFile;
+    });
+
+    // Export button
+    exportBtn.addEventListener('click', () => {
+      showStatus('Exporting Variables...');
+      downloadButtons.style.display = 'none';
+      exportedPrimitives = null;
+      exportedSemantic = null;
+      parent.postMessage({ pluginMessage: { type: 'EXPORT_VARIABLES' } }, '*');
+    });
+
+    // Download Primitives button
+    downloadPrimitivesBtn.addEventListener('click', () => {
+      if (exportedPrimitives) {
+        downloadTokens(exportedPrimitives, 'primitives-colors.json');
+        showStatus('✓ Downloaded primitives-colors.json', 'success');
+      }
+    });
+
+    // Download Semantic button
+    downloadSemanticBtn.addEventListener('click', () => {
+      if (exportedSemantic) {
+        downloadTokens(exportedSemantic, 'semantic-colors.json');
+        showStatus('✓ Downloaded semantic-colors.json', 'success');
+      }
+    });
+
+    // Import button
+    importBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const tokens = JSON.parse(e.target.result);
+          showStatus('Importing tokens...');
+          parent.postMessage({
+            pluginMessage: {
+              type: 'IMPORT_VARIABLES',
+              tokens
+            }
+          }, '*');
+        } catch (error) {
+          showStatus('Error: Invalid JSON file', 'error');
+        }
+      };
+      reader.readAsText(selectedFile);
+    });
+
+    // Handle messages from plugin code
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      switch (msg.type) {
+        case 'EXPORT_PROGRESS':
+          showStatus(msg.message);
+          break;
+
+        case 'EXPORT_COMPLETE':
+          exportedPrimitives = msg.primitives;
+          exportedSemantic = msg.semantic;
+          validationResult = msg.validation;
+
+          // Show download buttons
+          downloadButtons.style.display = 'block';
+
+          const primCount = exportedPrimitives ? Object.keys(exportedPrimitives).length : 0;
+          const semCount = exportedSemantic ? Object.keys(exportedSemantic).length : 0;
+
+          // Display validation status
+          displayValidation(validationResult);
+
+          showStatus(
+            `✓ Export complete! Primitives: ${primCount} groups, Semantic: ${semCount} tokens`,
+            'success'
+          );
+          break;
+
+        case 'IMPORT_PROGRESS':
+          showStatus(msg.message);
+          break;
+
+        case 'IMPORT_COMPLETE':
+          showStatus(`✓ Imported! Created: ${msg.created}, Updated: ${msg.updated}`, 'success');
+          break;
+
+        case 'ERROR':
+          showStatus(`Error: ${msg.error}`, 'error');
+          break;
+      }
+    };
+
+    function showStatus(message, type = '') {
+      status.textContent = message;
+      status.className = 'visible ' + type;
+    }
+
+    function downloadTokens(tokens, filename = 'tokens.json') {
+      const blob = new Blob([JSON.stringify(tokens, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function displayValidation(validation) {
+      if (!validation) {
+        validationStatus.style.display = 'none';
+        return;
+      }
+
+      validationStatus.style.display = 'block';
+
+      if (validation.valid) {
+        validationStatus.style.background = '#E5F5E5';
+        validationStatus.style.color = '#006600';
+        validationStatus.textContent = '✓ DTCG validation passed - output is spec compliant';
+      } else {
+        validationStatus.style.background = '#FFE5E5';
+        validationStatus.style.color = '#CC0000';
+
+        const messages = [];
+        if (validation.errorCount > 0) {
+          messages.push(`${validation.errorCount} error(s)`);
+        }
+        if (validation.warningCount > 0) {
+          messages.push(`${validation.warningCount} warning(s)`);
+        }
+
+        validationStatus.innerHTML = `
+          <strong>⚠️ DTCG Validation Issues:</strong><br/>
+          ${messages.join(', ')}<br/>
+          <span style="font-size: 9px;">Check console for details</span>
+        `;
+
+        // Log details to console
+        if (validation.details) {
+          console.group('DTCG Validation Details');
+          if (validation.details.primitives.errors.length > 0) {
+            console.error('Primitives Errors:', validation.details.primitives.errors);
+          }
+          if (validation.details.primitives.warnings.length > 0) {
+            console.warn('Primitives Warnings:', validation.details.primitives.warnings);
+          }
+          if (validation.details.semantic.errors.length > 0) {
+            console.error('Semantic Errors:', validation.details.semantic.errors);
+          }
+          if (validation.details.semantic.warnings.length > 0) {
+            console.warn('Semantic Warnings:', validation.details.semantic.warnings);
+          }
+          console.groupEnd();
+        }
+      }
+    }
+
+    function downloadDualTokens(primitives, semantic) {
+      // Download primitives
+      if (primitives && Object.keys(primitives).length > 0) {
+        const primitivesBlob = new Blob(
+          [JSON.stringify(primitives, null, 2)],
+          { type: 'application/json' }
+        );
+        const primitivesUrl = URL.createObjectURL(primitivesBlob);
+        const primitivesLink = document.createElement('a');
+        primitivesLink.href = primitivesUrl;
+        primitivesLink.download = 'primitives-colors.json';
+        document.body.appendChild(primitivesLink);
+        primitivesLink.click();
+        document.body.removeChild(primitivesLink);
+        URL.revokeObjectURL(primitivesUrl);
+
+        console.log('Downloaded primitives-colors.json');
+      }
+
+      // Download semantic (longer delay to ensure browser doesn't block)
+      if (semantic && Object.keys(semantic).length > 0) {
+        setTimeout(() => {
+          const semanticBlob = new Blob(
+            [JSON.stringify(semantic, null, 2)],
+            { type: 'application/json' }
+          );
+          const semanticUrl = URL.createObjectURL(semanticBlob);
+          const semanticLink = document.createElement('a');
+          semanticLink.href = semanticUrl;
+          semanticLink.download = 'semantic-colors.json';
+          document.body.appendChild(semanticLink);
+          semanticLink.click();
+          document.body.removeChild(semanticLink);
+          URL.revokeObjectURL(semanticUrl);
+
+          console.log('Downloaded semantic-colors.json');
+        }, 500);  // Increased delay from 100ms to 500ms
+      } else {
+        console.warn('Semantic tokens empty or missing:', semantic);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,10 +1,17 @@
 {
-  "figmaFileKey": "example-file-key",
-  "localPath": "./tokens",
-  "format": "dtcg",
-  "collections": ["material3-colors", "material3-typography"],
-  "modes": {
-    "Light": "light",
-    "Dark": "dark"
+  "version": "1.0",
+  "tokens": {
+    "input": "tokens.json",
+    "output": "tokens.json",
+    "format": "dtcg"
+  },
+  "sync": {
+    "preserveExtensions": true,
+    "sortKeys": false,
+    "indent": 2
+  },
+  "validation": {
+    "strictMode": true,
+    "allowCircularReferences": false
   }
 }

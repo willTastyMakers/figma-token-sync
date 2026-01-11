@@ -1,0 +1,22 @@
+{
+  "name": "@figma-token-sync/figma-plugin",
+  "version": "0.1.0",
+  "description": "Figma Plugin for Variables export/import",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:code && npm run build:ui",
+    "build:code": "esbuild src/code.ts --bundle --outfile=code.js --target=es2017 --format=iife",
+    "build:ui": "cp src/ui.html ui.html",
+    "dev": "npm run build:code -- --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@figma-token-sync/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.90.0",
+    "@types/node": "^20.12.7",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.7.0"
+  }
+}

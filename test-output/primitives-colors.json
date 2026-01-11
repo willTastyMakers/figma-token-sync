@@ -1,0 +1,17 @@
+{
+  "primary": {
+    "40": {
+      "$value": "#6750a4",
+      "$extensions": {
+        "com.figma": {
+          "variableId": "VariableID:66:4496",
+          "collectionId": "VariableCollectionId:66:4495",
+          "scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      }
+    },
+    "$type": "color"
+  }
+}

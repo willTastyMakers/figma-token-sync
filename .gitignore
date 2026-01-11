@@ -6,6 +6,13 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Figma plugin built files (in root for Figma to load)
+packages/figma-plugin/code.js
+packages/figma-plugin/code.js.map
+packages/figma-plugin/code.d.ts
+packages/figma-plugin/code.d.ts.map
+packages/figma-plugin/ui.html
+
 # Coverage
 coverage/
 
