@@ -1,10 +1,17 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+.yarn/
+.npm/
 
 # Build outputs
 dist/
+build/
+out/
 *.tsbuildinfo
+.next/
+.nuxt/
+.cache/
 
 # Figma plugin built files (in root for Figma to load)
 packages/figma-plugin/code.js
@@ -13,31 +20,94 @@ packages/figma-plugin/code.d.ts
 packages/figma-plugin/code.d.ts.map
 packages/figma-plugin/ui.html
 
-# Coverage
+# Test coverage
 coverage/
+*.lcov
+.nyc_output/
 
-# Turbo
+# Monorepo build cache
 .turbo/
 
 # Logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
-# Environment variables
+# Environment variables (NEVER commit these)
 .env
+.env.*
 .env.local
+.env.development
+.env.test
+.env.production
+.envrc
+.env.backup
+*.env
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
 
-# OS
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
 # Temporary files
 tmp/
 temp/
+*.tmp
+*.temp
+.sass-cache/
+
+# Package manager lock files (uncomment if needed)
+# package-lock.json
+# yarn.lock
+
+# Test output
+test-results/
+playwright-report/
+.screenshots/
+
+# Documentation build
+docs/.vitepress/dist
+docs/.vitepress/cache
+
+# Storybook
+storybook-static/
+.storybook-out/
+
+# Optional: Figma plugin test output
+packages/figma-plugin/manifest.json.backup
+
+# Debug
+*.cpuprofile
+*.heapsnapshot
+
+# Claude Code local settings (contains secrets)
+.claude/settings.local.json
+
+# Keep these files
+!.gitkeep
+!.npmrc
+!.nvmrc
+!.env.example
+!.claude/settings.local.json.example
