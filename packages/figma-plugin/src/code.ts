@@ -167,8 +167,8 @@ async function handleExport() {
  * Import Variables from DTCG format to Figma
  *
  * Two-pass approach:
- * 1. Create all primitive variables (with raw hex values)
- * 2. Create semantic variables (resolving DTCG aliases to Figma variable IDs)
+ * 1. Create all primitive variables (with raw hex values, single mode)
+ * 2. Create semantic variables (Light and Dark mode values)
  */
 async function handleImport(tokens: unknown) {
   figma.ui.postMessage({
@@ -192,26 +192,53 @@ async function handleImport(tokens: unknown) {
     console.log(`[METADATA] Version: ${metadata.version}`);
   }
 
-  // Separate primitives from semantics
-  // Primitives have "/" in name (e.g., "primary/40")
-  // Semantics don't have "/" (e.g., "primary", "onPrimary", "dark-primary")
-  // Skip $metadata field
+  // Helper: detect a collection wrapper (has no $type/$value — its children are the actual tokens)
+  function isCollectionWrapper(value: unknown): value is Record<string, any> {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !('$type' in (value as object)) &&
+      !('$value' in (value as object))
+    );
+  }
+
+  // Separate primitives from semantics by iterating into collection wrappers.
+  // tokens.json top-level shape:
+  //   { "$metadata": {...}, "Primitives": { "primary/0": { "$type", "$value": { "Value": "#hex" } } },
+  //                         "Semantic":   { "primary":   { "$type", "$value": { "Light": "#hex", "Dark": "#hex" } } } }
   const primitives: Array<{name: string; value: string; type: string}> = [];
-  const semantics: Array<{name: string; value: string; type: string}> = [];
+  const semantics: Array<{name: string; lightValue: string; darkValue: string; type: string}> = [];
 
-  for (const [tokenName, tokenData] of Object.entries(dtcgTokens)) {
+  for (const [collectionKey, collectionValue] of Object.entries(dtcgTokens)) {
     // Skip metadata
-    if (tokenName === '$metadata') continue;
+    if (collectionKey === '$metadata') continue;
 
-    if (typeof tokenData !== 'object' || !tokenData.$value) continue;
+    // Gap 1 fix: skip entries that are not collection wrappers
+    if (!isCollectionWrapper(collectionValue)) continue;
 
-    const value = tokenData.$value as string;
-    const type = tokenData.$type || 'color';
+    const isPrimitives = collectionKey === 'Primitives';
+    const isSemantic = collectionKey === 'Semantic';
 
-    if (tokenName.includes('/')) {
-      primitives.push({ name: tokenName, value, type });
-    } else {
-      semantics.push({ name: tokenName, value, type });
+    for (const [tokenName, tokenData] of Object.entries(collectionValue)) {
+      if (typeof tokenData !== 'object' || tokenData === null || !tokenData.$value) continue;
+
+      const type = tokenData.$type || 'color';
+      const rawValue = tokenData.$value; // Gap 2 fix: rawValue is an object, not a string
+
+      if (isPrimitives) {
+        // Primitives: $value = { "Value": "#hex" }
+        const hex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Value : rawValue;
+        if (hex) {
+          primitives.push({ name: tokenName, value: hex, type });
+        }
+      } else if (isSemantic) {
+        // Semantics: $value = { "Light": "#hex", "Dark": "#hex" }
+        const lightHex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Light : rawValue;
+        const darkHex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Dark : rawValue;
+        if (lightHex && darkHex) {
+          semantics.push({ name: tokenName, lightValue: lightHex, darkValue: darkHex, type });
+        }
+      }
     }
   }
 
@@ -227,6 +254,23 @@ async function handleImport(tokens: unknown) {
   }
 
   const defaultModeId = collection.modes[0].modeId;
+
+  // Ensure Light and Dark modes exist for semantic variables
+  let lightModeId = collection.modes.find(m => m.name === 'Light')?.modeId;
+  let darkModeId = collection.modes.find(m => m.name === 'Dark')?.modeId;
+
+  if (!lightModeId) {
+    // Rename the default mode to "Light"
+    collection.renameMode(defaultModeId, 'Light');
+    lightModeId = defaultModeId;
+    console.log(`[IMPORT] Renamed default mode to "Light"`);
+  }
+
+  if (!darkModeId) {
+    darkModeId = collection.addMode('Dark');
+    console.log(`[IMPORT] Added "Dark" mode: ${darkModeId}`);
+  }
+
   let created = 0;
   let updated = 0;
 
@@ -239,7 +283,7 @@ async function handleImport(tokens: unknown) {
   // Figma uses slash notation: "primary/100"
   const dtcgNameToFigmaId = new Map<string, string>();
 
-  // PASS 1: Create/update primitive variables (no aliases)
+  // PASS 1: Create/update primitive variables (single mode, raw hex)
   figma.ui.postMessage({
     type: 'IMPORT_PROGRESS',
     message: `Pass 1: Creating ${primitives.length} primitive variables...`,
@@ -261,7 +305,7 @@ async function handleImport(tokens: unknown) {
       updated++;
     }
 
-    // Set the raw hex value
+    // Set the raw hex value using defaultModeId
     try {
       const figmaValue = convertDTCGValueToFigmaValue(prim.value, prim.type);
       variable.setValueForMode(defaultModeId, figmaValue);
@@ -278,10 +322,10 @@ async function handleImport(tokens: unknown) {
   console.log(`[PASS1] Complete. Created ${created}, Updated ${updated}`);
   console.log(`[PASS1] Built ${dtcgNameToFigmaId.size} DTCG name mappings`);
 
-  // PASS 2: Create/update semantic variables (with alias resolution)
+  // PASS 2: Create/update semantic variables (Light and Dark mode values)
   figma.ui.postMessage({
     type: 'IMPORT_PROGRESS',
-    message: `Pass 2: Creating ${semantics.length} semantic variables with aliases...`,
+    message: `Pass 2: Creating ${semantics.length} semantic variables with Light/Dark modes...`,
   });
 
   for (const sem of semantics) {
@@ -300,10 +344,12 @@ async function handleImport(tokens: unknown) {
       updated++;
     }
 
-    // Resolve DTCG alias to Figma variable ID
+    // Set Light and Dark mode values
     try {
-      const figmaValue = resolveDTCGAlias(sem.value, sem.type, dtcgNameToFigmaId);
-      variable.setValueForMode(defaultModeId, figmaValue);
+      const lightFigmaValue = convertDTCGValueToFigmaValue(sem.lightValue, sem.type);
+      variable.setValueForMode(lightModeId, lightFigmaValue);
+      const darkFigmaValue = convertDTCGValueToFigmaValue(sem.darkValue, sem.type);
+      variable.setValueForMode(darkModeId, darkFigmaValue);
     } catch (error) {
       console.error(`[PASS2] Failed to set value for ${sem.name}:`, error);
     }
