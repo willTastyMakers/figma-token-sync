@@ -164,207 +164,133 @@ async function handleExport() {
 }
 
 /**
- * Import Variables from DTCG format to Figma
+ * Import Variables from figma-variables.json multi-collection format to Figma.
  *
- * Two-pass approach:
- * 1. Create all primitive variables (with raw hex values, single mode)
- * 2. Create semantic variables (Light and Dark mode values)
+ * Input structure:
+ *   {
+ *     "$metadata": { ... },
+ *     "Primitives":      { "primary/0": { "$type": "color", "$value": { "Value": "#000000" } }, ... },
+ *     "Semantic":        { "primary":   { "$type": "color", "$value": { "Light": "#4C662B", "Dark": "#B1D18A" } }, ... },
+ *     "Spacing & Shape": { "spacing/md":{ "$type": "number","$value": { "Value": 16 } }, ... }
+ *   }
  */
 async function handleImport(tokens: unknown) {
   figma.ui.postMessage({
     type: 'IMPORT_PROGRESS',
-    message: 'Parsing tokens.json...',
+    message: 'Parsing token file...',
   });
 
-  // Validate tokens
   if (typeof tokens !== 'object' || tokens === null) {
     throw new Error('Invalid tokens: must be an object');
   }
 
-  const dtcgTokens = tokens as Record<string, any>;
+  // Step 1 — Parse as collection file
+  const collectionFile = tokens as Record<string, Record<string, any>>;
+  const collectionEntries = Object.entries(collectionFile).filter(([key]) => key !== '$metadata');
 
-  // Extract metadata if present
-  const metadata = dtcgTokens.$metadata || {};
-  const collectionName = metadata.name || 'Design System';
+  console.log(`[IMPORT] Found ${collectionEntries.length} collections: ${collectionEntries.map(([k]) => k).join(', ')}`);
 
-  console.log(`[METADATA] Collection name: ${collectionName}`);
-  if (metadata.version) {
-    console.log(`[METADATA] Version: ${metadata.version}`);
-  }
+  const existingCollections = await figma.variables.getLocalVariableCollectionsAsync();
 
-  // Helper: detect a collection wrapper (has no $type/$value — its children are the actual tokens)
-  function isCollectionWrapper(value: unknown): value is Record<string, any> {
-    return (
-      typeof value === 'object' &&
-      value !== null &&
-      !('$type' in (value as object)) &&
-      !('$value' in (value as object))
-    );
-  }
+  let totalCreated = 0;
+  let totalUpdated = 0;
+  const results: Array<{ name: string; created: number; updated: number; modes: string[] }> = [];
 
-  // Separate primitives from semantics by iterating into collection wrappers.
-  // tokens.json top-level shape:
-  //   { "$metadata": {...}, "Primitives": { "primary/0": { "$type", "$value": { "Value": "#hex" } } },
-  //                         "Semantic":   { "primary":   { "$type", "$value": { "Light": "#hex", "Dark": "#hex" } } } }
-  const primitives: Array<{name: string; value: string; type: string}> = [];
-  const semantics: Array<{name: string; lightValue: string; darkValue: string; type: string}> = [];
+  // Step 2 — Process each collection
+  for (const [collectionName, collectionTokens] of collectionEntries) {
+    figma.ui.postMessage({
+      type: 'IMPORT_PROGRESS',
+      message: `Processing collection: ${collectionName}...`,
+    });
 
-  for (const [collectionKey, collectionValue] of Object.entries(dtcgTokens)) {
-    // Skip metadata
-    if (collectionKey === '$metadata') continue;
+    try {
+      // 2a — Find existing or create new collection
+      let collection = existingCollections.find(c => c.name === collectionName);
+      if (!collection) {
+        collection = figma.variables.createVariableCollection(collectionName);
+        console.log(`[IMPORT] Created collection: ${collectionName}`);
+      }
 
-    // Gap 1 fix: skip entries that are not collection wrappers
-    if (!isCollectionWrapper(collectionValue)) continue;
+      // 2b — Determine mode names from the first token's $value keys
+      const tokenEntries = Object.entries(collectionTokens);
+      if (tokenEntries.length === 0) {
+        console.warn(`[IMPORT] Collection "${collectionName}" is empty — skipping`);
+        continue;
+      }
+      const firstToken = tokenEntries[0][1] as any;
+      const modeNames: string[] = Object.keys(firstToken.$value);
+      console.log(`[IMPORT] Collection "${collectionName}" modes: ${modeNames.join(', ')}`);
 
-    const isPrimitives = collectionKey === 'Primitives';
-    const isSemantic = collectionKey === 'Semantic';
-
-    for (const [tokenName, tokenData] of Object.entries(collectionValue)) {
-      if (typeof tokenData !== 'object' || tokenData === null || !tokenData.$value) continue;
-
-      const type = tokenData.$type || 'color';
-      const rawValue = tokenData.$value; // Gap 2 fix: rawValue is an object, not a string
-
-      if (isPrimitives) {
-        // Primitives: $value = { "Value": "#hex" }
-        const hex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Value : rawValue;
-        if (hex) {
-          primitives.push({ name: tokenName, value: hex, type });
-        }
-      } else if (isSemantic) {
-        // Semantics: $value = { "Light": "#hex", "Dark": "#hex" }
-        const lightHex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Light : rawValue;
-        const darkHex = typeof rawValue === 'object' && rawValue !== null ? rawValue.Dark : rawValue;
-        if (lightHex && darkHex) {
-          semantics.push({ name: tokenName, lightValue: lightHex, darkValue: darkHex, type });
+      // 2c — Rename default mode; add any additional modes
+      const defaultMode = collection.modes[0];
+      if (defaultMode.name !== modeNames[0]) {
+        collection.renameMode(defaultMode.modeId, modeNames[0]);
+      }
+      for (const modeName of modeNames.slice(1)) {
+        const exists = collection.modes.some(m => m.name === modeName);
+        if (!exists) {
+          collection.addMode(modeName);
         }
       }
-    }
-  }
 
-  console.log(`[IMPORT] Found ${primitives.length} primitives, ${semantics.length} semantics`);
-
-  // Get or create collection
-  const existingCollections = await figma.variables.getLocalVariableCollectionsAsync();
-  let collection = existingCollections.find(c => c.name === collectionName);
-
-  if (!collection) {
-    collection = figma.variables.createVariableCollection(collectionName);
-    console.log(`[IMPORT] Created collection: ${collectionName}`);
-  }
-
-  const defaultModeId = collection.modes[0].modeId;
-
-  // Ensure Light and Dark modes exist for semantic variables
-  let lightModeId = collection.modes.find(m => m.name === 'Light')?.modeId;
-  let darkModeId = collection.modes.find(m => m.name === 'Dark')?.modeId;
-
-  if (!lightModeId) {
-    // Rename the default mode to "Light"
-    collection.renameMode(defaultModeId, 'Light');
-    lightModeId = defaultModeId;
-    console.log(`[IMPORT] Renamed default mode to "Light"`);
-  }
-
-  if (!darkModeId) {
-    darkModeId = collection.addMode('Dark');
-    console.log(`[IMPORT] Added "Dark" mode: ${darkModeId}`);
-  }
-
-  let created = 0;
-  let updated = 0;
-
-  // Get existing variables
-  const existingVariables = await figma.variables.getLocalVariablesAsync();
-  const variablesByName = new Map(existingVariables.map(v => [v.name, v]));
-
-  // Map to track DTCG names to Figma variable IDs
-  // DTCG uses dot notation: "primary.100"
-  // Figma uses slash notation: "primary/100"
-  const dtcgNameToFigmaId = new Map<string, string>();
-
-  // PASS 1: Create/update primitive variables (single mode, raw hex)
-  figma.ui.postMessage({
-    type: 'IMPORT_PROGRESS',
-    message: `Pass 1: Creating ${primitives.length} primitive variables...`,
-  });
-
-  for (const prim of primitives) {
-    let variable = variablesByName.get(prim.name);
-
-    if (!variable) {
-      variable = figma.variables.createVariable(
-        prim.name,
-        collection,
-        prim.type === 'color' ? 'COLOR' : 'FLOAT'
+      // 2d — Build modeId map (re-read after potential additions)
+      const modeIdMap = new Map<string, string>(
+        collection.modes.map(m => [m.name, m.modeId])
       );
-      variablesByName.set(prim.name, variable);
-      created++;
-      console.log(`[PASS1] Created: ${prim.name}`);
-    } else {
-      updated++;
-    }
 
-    // Set the raw hex value using defaultModeId
-    try {
-      const figmaValue = convertDTCGValueToFigmaValue(prim.value, prim.type);
-      variable.setValueForMode(defaultModeId, figmaValue);
+      // Step 3 — Create/update variables for this collection
+      const allVars = await figma.variables.getLocalVariablesAsync();
+      const existingVars = allVars.filter(v => v.variableCollectionId === collection!.id);
+      const varByName = new Map(existingVars.map(v => [v.name, v]));
+
+      let created = 0;
+      let updated = 0;
+
+      for (const [tokenName, tokenData] of tokenEntries) {
+        if (tokenName.startsWith('$')) continue;
+
+        const resolvedType = tokenData.$type === 'color' ? 'COLOR' : 'FLOAT';
+
+        let variable = varByName.get(tokenName);
+        if (!variable) {
+          variable = figma.variables.createVariable(tokenName, collection!, resolvedType);
+          created++;
+        } else {
+          updated++;
+        }
+
+        for (const [modeName, modeId] of modeIdMap) {
+          const rawValue = tokenData.$value[modeName];
+          if (rawValue === undefined) continue;
+
+          const figmaValue = resolvedType === 'COLOR'
+            ? hexToFigmaColor(rawValue as string)
+            : (rawValue as number);
+
+          variable.setValueForMode(modeId, figmaValue);
+        }
+      }
+
+      console.log(`[IMPORT] "${collectionName}": created ${created}, updated ${updated}`);
+      totalCreated += created;
+      totalUpdated += updated;
+      results.push({ name: collectionName, created, updated, modes: modeNames });
+
     } catch (error) {
-      console.error(`[PASS1] Failed to set value for ${prim.name}:`, error);
-    }
-
-    // Build mapping: "primary.100" -> Figma variable ID
-    // Convert slash notation to dot notation for DTCG compatibility
-    const dtcgName = prim.name.replace('/', '.');
-    dtcgNameToFigmaId.set(dtcgName, variable.id);
-  }
-
-  console.log(`[PASS1] Complete. Created ${created}, Updated ${updated}`);
-  console.log(`[PASS1] Built ${dtcgNameToFigmaId.size} DTCG name mappings`);
-
-  // PASS 2: Create/update semantic variables (Light and Dark mode values)
-  figma.ui.postMessage({
-    type: 'IMPORT_PROGRESS',
-    message: `Pass 2: Creating ${semantics.length} semantic variables with Light/Dark modes...`,
-  });
-
-  for (const sem of semantics) {
-    let variable = variablesByName.get(sem.name);
-
-    if (!variable) {
-      variable = figma.variables.createVariable(
-        sem.name,
-        collection,
-        sem.type === 'color' ? 'COLOR' : 'FLOAT'
-      );
-      variablesByName.set(sem.name, variable);
-      created++;
-      console.log(`[PASS2] Created: ${sem.name}`);
-    } else {
-      updated++;
-    }
-
-    // Set Light and Dark mode values
-    try {
-      const lightFigmaValue = convertDTCGValueToFigmaValue(sem.lightValue, sem.type);
-      variable.setValueForMode(lightModeId, lightFigmaValue);
-      const darkFigmaValue = convertDTCGValueToFigmaValue(sem.darkValue, sem.type);
-      variable.setValueForMode(darkModeId, darkFigmaValue);
-    } catch (error) {
-      console.error(`[PASS2] Failed to set value for ${sem.name}:`, error);
+      console.error(`[IMPORT] Failed to process collection "${collectionName}":`, error);
+      results.push({ name: collectionName, created: 0, updated: 0, modes: [] });
     }
   }
 
-  console.log(`[PASS2] Complete. Total created: ${created}, Updated: ${updated}`);
-
+  // Step 4 — Post completion
   figma.ui.postMessage({
     type: 'IMPORT_COMPLETE',
-    created,
-    updated,
-    deleted: 0,
+    collections: results,
+    totalCreated,
+    totalUpdated,
   });
 
-  figma.notify(`✓ Import complete! Created: ${created}, Updated: ${updated}`);
+  figma.notify(`✓ Import complete! Created: ${totalCreated}, Updated: ${totalUpdated}`);
 }
 
 /**
@@ -395,54 +321,3 @@ function hexToFigmaColor(hex: string): { r: number; g: number; b: number; a: num
   };
 }
 
-/**
- * Convert DTCG value to Figma format (for primitives with raw values)
- */
-function convertDTCGValueToFigmaValue(value: string, type: string): FigmaVariableValue {
-  if (type === 'color') {
-    // Convert hex to RGBA
-    return hexToFigmaColor(value);
-  }
-
-  // For numbers, parse
-  if (type === 'number' || type === 'dimension') {
-    return parseFloat(value);
-  }
-
-  return value;
-}
-
-/**
- * Resolve DTCG alias reference to Figma variable alias or raw value
- *
- * Handles:
- * - DTCG aliases: "{primary.100}" -> Figma VARIABLE_ALIAS with actual ID
- * - Raw hex values: "#FFFFFF" -> Figma RGBA
- */
-function resolveDTCGAlias(
-  value: string,
-  type: string,
-  dtcgNameToFigmaId: Map<string, string>
-): FigmaVariableValue {
-  // Check if it's an alias
-  if (value.startsWith('{') && value.endsWith('}')) {
-    const aliasPath = value.slice(1, -1); // Remove { }
-    console.log(`[RESOLVE] Resolving alias: ${aliasPath}`);
-
-    const figmaId = dtcgNameToFigmaId.get(aliasPath);
-    if (figmaId) {
-      console.log(`[RESOLVE] ✓ Found Figma ID for ${aliasPath}: ${figmaId}`);
-      return {
-        type: 'VARIABLE_ALIAS',
-        id: figmaId,
-      };
-    } else {
-      console.error(`[RESOLVE] ✗ Could not resolve alias: ${aliasPath}`);
-      // Fallback to raw value if can't resolve
-      throw new Error(`Alias not found: ${aliasPath}`);
-    }
-  }
-
-  // Not an alias, convert raw value
-  return convertDTCGValueToFigmaValue(value, type);
-}
