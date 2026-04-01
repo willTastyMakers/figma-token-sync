@@ -96,11 +96,15 @@
 
   <div class="section">
     <h1>📥 Import Variables</h1>
+    <p style="margin: 0 0 8px; color: #999; font-size: 10px;">
+      Accepts figma-variables.json from DDS export
+    </p>
     <p style="margin: 0 0 12px; color: #666;">
       Import tokens.json to Figma Variables
     </p>
     <input type="file" id="fileInput" accept=".json" />
-    <button id="import" disabled>Import from DTCG</button>
+    <div id="selectedFile" style="display:none; color:#999; font-size:10px; margin-bottom:8px;"></div>
+    <button id="import" disabled>Import to Figma</button>
   </div>
 
   <div id="status"></div>
@@ -124,6 +128,11 @@
     fileInput.addEventListener('change', (e) => {
       selectedFile = e.target.files[0];
       importBtn.disabled = !selectedFile;
+      const selectedFileDiv = document.getElementById('selectedFile');
+      if (selectedFileDiv) {
+        selectedFileDiv.textContent = 'Selected: ' + (selectedFile ? selectedFile.name : '');
+        selectedFileDiv.style.display = selectedFile ? 'block' : 'none';
+      }
     });
 
     // Export button
@@ -207,9 +216,27 @@
           showStatus(msg.message);
           break;
 
-        case 'IMPORT_COMPLETE':
-          showStatus(`✓ Imported! Created: ${msg.created}, Updated: ${msg.updated}`, 'success');
+        case 'IMPORT_COMPLETE': {
+          const rows = (msg.collections || []).map(c => {
+            const pills = (c.modes || []).map(m =>
+              `<span style="display:inline-block;padding:1px 5px;border-radius:3px;background:#D0E8FF;color:#0055AA;font-size:9px;margin-left:3px;">${m}</span>`
+            ).join('');
+            const count = (c.created || 0) + (c.updated || 0);
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #D5EDD5;">
+              <span style="font-weight:500;">${c.name}</span>
+              <span>${count} vars${pills}</span>
+            </div>`;
+          }).join('');
+          status.className = 'visible success';
+          status.innerHTML = `
+            <strong>✓ Import complete!</strong>
+            <div style="margin-top:8px;">${rows}</div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #C3E6C3;">
+              Total: ${msg.totalCreated || 0} created, ${msg.totalUpdated || 0} updated
+            </div>
+          `;
           break;
+        }
 
         case 'ERROR':
           showStatus(`Error: ${msg.error}`, 'error');
