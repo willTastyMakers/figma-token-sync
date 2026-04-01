@@ -16,6 +16,7 @@ export interface DesignLanguageContract {
   shape: ShapeConfig;
   elevation: ElevationConfig;
   motion: MotionConfig;
+  border?: BorderConfig;
 }
 
 export interface ColorPalettes {
@@ -80,11 +81,60 @@ export interface SemanticColors {
   shadow: string;
 }
 
+export type WeightName =
+  | 'thin' | 'light' | 'regular' | 'medium' | 'semiBold' | 'bold' | 'extraBold';
+
+export interface FontWeightMap {
+  '100'?: string;
+  '200'?: string;
+  '300'?: string;
+  '400'?: string;
+  '500'?: string;
+  '600'?: string;
+  '700'?: string;
+  '800'?: string;
+  '900'?: string;
+}
+
+export interface FontConfig {
+  family: string;
+  figmaName: string;
+  weightMap: FontWeightMap;
+}
+
+export interface TypeGeometry {
+  fontSize: string;
+  lineHeight: string;
+  letterSpacing: string;
+  fontFamily: 'display' | 'body' | 'mono';
+  fontVariationSettings?: string;
+}
+
+export interface WeightVariant {
+  name: WeightName;
+  fontWeight: string;
+  fontVariationSettings?: string;
+}
+
+export interface TypeScaleStep {
+  geometry: TypeGeometry;
+  defaultWeight: WeightName;
+  weights: Partial<Record<WeightName, WeightVariant>>;
+}
+
+export interface BorderConfig {
+  widths: {
+    thin: string;
+    medium: string;
+    thick: string;
+  };
+}
+
 export interface TypographyConfig {
   fonts: {
-    display: string;
-    body: string;
-    mono: string;
+    display: FontConfig;
+    body: FontConfig;
+    mono: FontConfig;
   };
   scale: TypographyScale;
 }
@@ -95,24 +145,25 @@ export interface TypeStyle {
   fontWeight: string;
   letterSpacing: string;
   fontFamily?: 'display' | 'body' | 'mono';
+  fontVariationSettings?: string;
 }
 
 export interface TypographyScale {
-  displayLarge: TypeStyle;
-  displayMedium: TypeStyle;
-  displaySmall: TypeStyle;
-  headlineLarge: TypeStyle;
-  headlineMedium: TypeStyle;
-  headlineSmall: TypeStyle;
-  titleLarge: TypeStyle;
-  titleMedium: TypeStyle;
-  titleSmall: TypeStyle;
-  bodyLarge: TypeStyle;
-  bodyMedium: TypeStyle;
-  bodySmall: TypeStyle;
-  labelLarge: TypeStyle;
-  labelMedium: TypeStyle;
-  labelSmall: TypeStyle;
+  displayLarge: TypeScaleStep;
+  displayMedium: TypeScaleStep;
+  displaySmall: TypeScaleStep;
+  headlineLarge: TypeScaleStep;
+  headlineMedium: TypeScaleStep;
+  headlineSmall: TypeScaleStep;
+  titleLarge: TypeScaleStep;
+  titleMedium: TypeScaleStep;
+  titleSmall: TypeScaleStep;
+  bodyLarge: TypeScaleStep;
+  bodyMedium: TypeScaleStep;
+  bodySmall: TypeScaleStep;
+  labelLarge: TypeScaleStep;
+  labelMedium: TypeScaleStep;
+  labelSmall: TypeScaleStep;
 }
 
 export interface SpacingScale {
@@ -207,7 +258,11 @@ export function languageToTokens(language: DesignLanguageContract): DTCGTokens {
     'designLanguageContract': {
       name: language.name,
       version: language.version,
-      typographyStyle: language.typography.fonts,
+      typographyFonts: {
+        display: language.typography.fonts.display.family,
+        body: language.typography.fonts.body.family,
+        mono: language.typography.fonts.mono.family,
+      },
       shapeStyle: language.shape.style,
       elevationStyle: language.elevation.style,
       motionStyle: language.motion.style,
