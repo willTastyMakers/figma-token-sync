@@ -8,6 +8,21 @@
  * It communicates with the UI (ui.html) via postMessage.
  */
 
+/**
+ * Local TextStyleDef — identical shape to typography.transformer.ts TextStyleDef.
+ * Defined here because the plugin sandbox cannot use Node modules; defs arrive
+ * pre-computed from the UI.
+ */
+interface TextStyleDef {
+  name: string;
+  fontFamily: string;
+  fontStyle: string;
+  fontSize: number;
+  lineHeightPx: number;
+  letterSpacing: number;
+  tokenPath: string;
+}
+
 import { figmaToTokens, tokensToFigma } from '@figma-token-sync/core/transforms/figma-transform';
 import type {
   FigmaPluginExport,
@@ -34,6 +49,10 @@ figma.ui.onmessage = async (msg) => {
 
       case 'IMPORT_VARIABLES':
         await handleImport(msg.tokens);
+        break;
+
+      case 'IMPORT_TEXT_STYLES':
+        await handleImportTextStyles(msg.defs);
         break;
 
       case 'CANCEL':
@@ -291,6 +310,55 @@ async function handleImport(tokens: unknown) {
   });
 
   figma.notify(`✓ Import complete! Created: ${totalCreated}, Updated: ${totalUpdated}`);
+}
+
+/**
+ * Import text styles from pre-computed TextStyleDef array.
+ * Fonts are batch-loaded before any createTextStyle() call.
+ */
+async function handleImportTextStyles(defs: unknown) {
+  // 1. Validate
+  if (!Array.isArray(defs) || defs.length === 0) {
+    throw new Error('IMPORT_TEXT_STYLES requires a non-empty array of TextStyleDef objects');
+  }
+
+  // 2. Cast
+  const styleDefs = defs as TextStyleDef[];
+
+  // 3. Batch-load all unique font pairs before any createTextStyle() call
+  const uniqueFonts = [
+    ...new Map(
+      styleDefs.map(d => [d.fontFamily + '|' + d.fontStyle,
+                          { family: d.fontFamily, style: d.fontStyle }])
+    ).values()
+  ];
+  await Promise.all(uniqueFonts.map(f => figma.loadFontAsync(f)));
+
+  // 4. Build idempotency set
+  const existing = new Set(
+    (await figma.getLocalTextStylesAsync()).map(s => s.name)
+  );
+
+  // 5. Loop and create missing styles
+  const created: string[] = [];
+  const skipped: string[] = [];
+  for (const def of styleDefs) {
+    if (existing.has(def.name)) { skipped.push(def.name); continue; }
+    const style = figma.createTextStyle();
+    style.name          = def.name;
+    style.fontName      = { family: def.fontFamily, style: def.fontStyle };
+    style.fontSize      = def.fontSize;
+    style.lineHeight    = { value: def.lineHeightPx, unit: 'PIXELS' };
+    style.letterSpacing = { value: def.letterSpacing, unit: 'PIXELS' };
+    style.description   = 'token: ' + def.tokenPath;
+    created.push(def.name);
+  }
+
+  // 6. Post completion
+  figma.ui.postMessage({ type: 'IMPORT_TEXT_STYLES_COMPLETE', created, skipped });
+
+  // 7. Notify
+  figma.notify('✓ Text styles: ' + created.length + ' created, ' + skipped.length + ' skipped');
 }
 
 /**

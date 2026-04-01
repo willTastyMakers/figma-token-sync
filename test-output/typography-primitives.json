@@ -1,0 +1,264 @@
+{
+  "Font": {
+    "Size": {
+      "displayLarge": {
+        "$type": "number",
+        "$value": 57
+      },
+      "displayMedium": {
+        "$type": "number",
+        "$value": 45
+      },
+      "displaySmall": {
+        "$type": "number",
+        "$value": 36
+      },
+      "headlineLarge": {
+        "$type": "number",
+        "$value": 32
+      },
+      "headlineMedium": {
+        "$type": "number",
+        "$value": 28
+      },
+      "headlineSmall": {
+        "$type": "number",
+        "$value": 24
+      },
+      "titleLarge": {
+        "$type": "number",
+        "$value": 22
+      },
+      "titleMedium": {
+        "$type": "number",
+        "$value": 16
+      },
+      "titleSmall": {
+        "$type": "number",
+        "$value": 14
+      },
+      "bodyLarge": {
+        "$type": "number",
+        "$value": 18
+      },
+      "bodyMedium": {
+        "$type": "number",
+        "$value": 14
+      },
+      "bodySmall": {
+        "$type": "number",
+        "$value": 12
+      },
+      "labelLarge": {
+        "$type": "number",
+        "$value": 14
+      },
+      "labelMedium": {
+        "$type": "number",
+        "$value": 12
+      },
+      "labelSmall": {
+        "$type": "number",
+        "$value": 11
+      }
+    },
+    "LineHeight": {
+      "displayLarge": {
+        "$type": "number",
+        "$value": 64
+      },
+      "displayMedium": {
+        "$type": "number",
+        "$value": 52
+      },
+      "displaySmall": {
+        "$type": "number",
+        "$value": 44
+      },
+      "headlineLarge": {
+        "$type": "number",
+        "$value": 40
+      },
+      "headlineMedium": {
+        "$type": "number",
+        "$value": 36
+      },
+      "headlineSmall": {
+        "$type": "number",
+        "$value": 32
+      },
+      "titleLarge": {
+        "$type": "number",
+        "$value": 28
+      },
+      "titleMedium": {
+        "$type": "number",
+        "$value": 24
+      },
+      "titleSmall": {
+        "$type": "number",
+        "$value": 20
+      },
+      "bodyLarge": {
+        "$type": "number",
+        "$value": 28
+      },
+      "bodyMedium": {
+        "$type": "number",
+        "$value": 20
+      },
+      "bodySmall": {
+        "$type": "number",
+        "$value": 16
+      },
+      "labelLarge": {
+        "$type": "number",
+        "$value": 20
+      },
+      "labelMedium": {
+        "$type": "number",
+        "$value": 16
+      },
+      "labelSmall": {
+        "$type": "number",
+        "$value": 16
+      }
+    },
+    "LetterSpacing": {
+      "displayLarge": {
+        "$type": "number",
+        "$value": -0.25
+      },
+      "displayMedium": {
+        "$type": "number",
+        "$value": 0
+      },
+      "displaySmall": {
+        "$type": "number",
+        "$value": 0
+      },
+      "headlineLarge": {
+        "$type": "number",
+        "$value": 0
+      },
+      "headlineMedium": {
+        "$type": "number",
+        "$value": 0
+      },
+      "headlineSmall": {
+        "$type": "number",
+        "$value": 0
+      },
+      "titleLarge": {
+        "$type": "number",
+        "$value": 0
+      },
+      "titleMedium": {
+        "$type": "number",
+        "$value": 0.15
+      },
+      "titleSmall": {
+        "$type": "number",
+        "$value": 0.1
+      },
+      "bodyLarge": {
+        "$type": "number",
+        "$value": 0.5
+      },
+      "bodyMedium": {
+        "$type": "number",
+        "$value": 0.25
+      },
+      "bodySmall": {
+        "$type": "number",
+        "$value": 0.4
+      },
+      "labelLarge": {
+        "$type": "number",
+        "$value": 0.1
+      },
+      "labelMedium": {
+        "$type": "number",
+        "$value": 0.5
+      },
+      "labelSmall": {
+        "$type": "number",
+        "$value": 0.5
+      }
+    },
+    "Family": {
+      "display": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "body": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "mono": {
+        "$type": "string",
+        "$value": "JetBrains Mono"
+      },
+      "displayLarge": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "displayMedium": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "displaySmall": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "headlineLarge": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "headlineMedium": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "headlineSmall": {
+        "$type": "string",
+        "$value": "Fraunces"
+      },
+      "titleLarge": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "titleMedium": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "titleSmall": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "bodyLarge": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "bodyMedium": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "bodySmall": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "labelLarge": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "labelMedium": {
+        "$type": "string",
+        "$value": "Poppins"
+      },
+      "labelSmall": {
+        "$type": "string",
+        "$value": "Poppins"
+      }
+    }
+  }
+}

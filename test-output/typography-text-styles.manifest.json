@@ -1,0 +1,461 @@
+[
+  {
+    "name": "Display/Large/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 57,
+    "lineHeightPx": 64,
+    "letterSpacing": -0.25,
+    "tokenPath": "typography.scale.displayLarge.weights.regular"
+  },
+  {
+    "name": "Display/Large/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 57,
+    "lineHeightPx": 64,
+    "letterSpacing": -0.25,
+    "tokenPath": "typography.scale.displayLarge.weights.semiBold"
+  },
+  {
+    "name": "Display/Medium/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 45,
+    "lineHeightPx": 52,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.displayMedium.weights.regular"
+  },
+  {
+    "name": "Display/Medium/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 45,
+    "lineHeightPx": 52,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.displayMedium.weights.semiBold"
+  },
+  {
+    "name": "Display/Small/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 36,
+    "lineHeightPx": 44,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.displaySmall.weights.regular"
+  },
+  {
+    "name": "Display/Small/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 36,
+    "lineHeightPx": 44,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.displaySmall.weights.semiBold"
+  },
+  {
+    "name": "Headline/Large/Light",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Light",
+    "fontSize": 32,
+    "lineHeightPx": 40,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineLarge.weights.light"
+  },
+  {
+    "name": "Headline/Large/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 32,
+    "lineHeightPx": 40,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineLarge.weights.regular"
+  },
+  {
+    "name": "Headline/Large/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 32,
+    "lineHeightPx": 40,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineLarge.weights.semiBold"
+  },
+  {
+    "name": "Headline/Medium/Light",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Light",
+    "fontSize": 28,
+    "lineHeightPx": 36,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineMedium.weights.light"
+  },
+  {
+    "name": "Headline/Medium/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 28,
+    "lineHeightPx": 36,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineMedium.weights.regular"
+  },
+  {
+    "name": "Headline/Medium/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 28,
+    "lineHeightPx": 36,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineMedium.weights.semiBold"
+  },
+  {
+    "name": "Headline/Small/Light",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Light",
+    "fontSize": 24,
+    "lineHeightPx": 32,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineSmall.weights.light"
+  },
+  {
+    "name": "Headline/Small/Regular",
+    "fontFamily": "Fraunces",
+    "fontStyle": "Regular",
+    "fontSize": 24,
+    "lineHeightPx": 32,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineSmall.weights.regular"
+  },
+  {
+    "name": "Headline/Small/SemiBold",
+    "fontFamily": "Fraunces",
+    "fontStyle": "SemiBold",
+    "fontSize": 24,
+    "lineHeightPx": 32,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.headlineSmall.weights.semiBold"
+  },
+  {
+    "name": "Title/Large/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 22,
+    "lineHeightPx": 28,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.titleLarge.weights.regular"
+  },
+  {
+    "name": "Title/Large/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 22,
+    "lineHeightPx": 28,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.titleLarge.weights.medium"
+  },
+  {
+    "name": "Title/Large/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 22,
+    "lineHeightPx": 28,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.titleLarge.weights.semiBold"
+  },
+  {
+    "name": "Title/Large/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 22,
+    "lineHeightPx": 28,
+    "letterSpacing": 0,
+    "tokenPath": "typography.scale.titleLarge.weights.bold"
+  },
+  {
+    "name": "Title/Medium/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 16,
+    "lineHeightPx": 24,
+    "letterSpacing": 0.15,
+    "tokenPath": "typography.scale.titleMedium.weights.regular"
+  },
+  {
+    "name": "Title/Medium/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 16,
+    "lineHeightPx": 24,
+    "letterSpacing": 0.15,
+    "tokenPath": "typography.scale.titleMedium.weights.medium"
+  },
+  {
+    "name": "Title/Medium/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 16,
+    "lineHeightPx": 24,
+    "letterSpacing": 0.15,
+    "tokenPath": "typography.scale.titleMedium.weights.semiBold"
+  },
+  {
+    "name": "Title/Medium/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 16,
+    "lineHeightPx": 24,
+    "letterSpacing": 0.15,
+    "tokenPath": "typography.scale.titleMedium.weights.bold"
+  },
+  {
+    "name": "Title/Small/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.titleSmall.weights.regular"
+  },
+  {
+    "name": "Title/Small/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.titleSmall.weights.medium"
+  },
+  {
+    "name": "Title/Small/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.titleSmall.weights.semiBold"
+  },
+  {
+    "name": "Title/Small/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.titleSmall.weights.bold"
+  },
+  {
+    "name": "Body/Large/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 18,
+    "lineHeightPx": 28,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.bodyLarge.weights.light"
+  },
+  {
+    "name": "Body/Large/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 18,
+    "lineHeightPx": 28,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.bodyLarge.weights.regular"
+  },
+  {
+    "name": "Body/Large/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 18,
+    "lineHeightPx": 28,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.bodyLarge.weights.medium"
+  },
+  {
+    "name": "Body/Large/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 18,
+    "lineHeightPx": 28,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.bodyLarge.weights.semiBold"
+  },
+  {
+    "name": "Body/Medium/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.25,
+    "tokenPath": "typography.scale.bodyMedium.weights.light"
+  },
+  {
+    "name": "Body/Medium/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.25,
+    "tokenPath": "typography.scale.bodyMedium.weights.regular"
+  },
+  {
+    "name": "Body/Medium/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.25,
+    "tokenPath": "typography.scale.bodyMedium.weights.medium"
+  },
+  {
+    "name": "Body/Medium/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.25,
+    "tokenPath": "typography.scale.bodyMedium.weights.semiBold"
+  },
+  {
+    "name": "Body/Small/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.4,
+    "tokenPath": "typography.scale.bodySmall.weights.light"
+  },
+  {
+    "name": "Body/Small/Regular",
+    "fontFamily": "Poppins",
+    "fontStyle": "Regular",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.4,
+    "tokenPath": "typography.scale.bodySmall.weights.regular"
+  },
+  {
+    "name": "Body/Small/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.4,
+    "tokenPath": "typography.scale.bodySmall.weights.medium"
+  },
+  {
+    "name": "Body/Small/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.4,
+    "tokenPath": "typography.scale.bodySmall.weights.semiBold"
+  },
+  {
+    "name": "Label/Large/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.labelLarge.weights.light"
+  },
+  {
+    "name": "Label/Large/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.labelLarge.weights.medium"
+  },
+  {
+    "name": "Label/Large/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.labelLarge.weights.semiBold"
+  },
+  {
+    "name": "Label/Large/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 14,
+    "lineHeightPx": 20,
+    "letterSpacing": 0.1,
+    "tokenPath": "typography.scale.labelLarge.weights.bold"
+  },
+  {
+    "name": "Label/Medium/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelMedium.weights.light"
+  },
+  {
+    "name": "Label/Medium/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelMedium.weights.medium"
+  },
+  {
+    "name": "Label/Medium/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelMedium.weights.semiBold"
+  },
+  {
+    "name": "Label/Medium/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 12,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelMedium.weights.bold"
+  },
+  {
+    "name": "Label/Small/Light",
+    "fontFamily": "Poppins",
+    "fontStyle": "Light",
+    "fontSize": 11,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelSmall.weights.light"
+  },
+  {
+    "name": "Label/Small/Medium",
+    "fontFamily": "Poppins",
+    "fontStyle": "Medium",
+    "fontSize": 11,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelSmall.weights.medium"
+  },
+  {
+    "name": "Label/Small/SemiBold",
+    "fontFamily": "Poppins",
+    "fontStyle": "SemiBold",
+    "fontSize": 11,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelSmall.weights.semiBold"
+  },
+  {
+    "name": "Label/Small/Bold",
+    "fontFamily": "Poppins",
+    "fontStyle": "Bold",
+    "fontSize": 11,
+    "lineHeightPx": 16,
+    "letterSpacing": 0.5,
+    "tokenPath": "typography.scale.labelSmall.weights.bold"
+  }
+]

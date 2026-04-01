@@ -5,6 +5,7 @@ import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { convertCommand } from './commands/convert.js';
 import { diffCommand } from './commands/diff.js';
+import { generateTypographyCommand } from './commands/generate-typography.js';
 
 const program = new Command();
 
@@ -20,6 +21,7 @@ program.addCommand(initCommand);
 program.addCommand(validateCommand);
 program.addCommand(convertCommand);
 program.addCommand(diffCommand);
+program.addCommand(generateTypographyCommand);
 
 // Note: Pull/push operations are handled by the Figma Plugin, not CLI
 // The plugin exports/imports tokens.json files directly
